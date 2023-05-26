@@ -21,11 +21,9 @@ public class GameServer implements ServerNetListener {
     Random random=new Random();
     public int id0=1000;
     public int id1=1000;
-    int idcount=-1;
     private boolean RB=true;
     private String temp1;
     private String temp2;
-    private int def;
     private ArrayList<Integer> LoseConnectPlayers=new ArrayList<Integer>();
     private ArrayList<Integer> players=new ArrayList<Integer>();
     private int playMax=2;
@@ -49,7 +47,7 @@ public class GameServer implements ServerNetListener {
         System.out.println(temp2);
         switch (temp1){
             case "refresh0":{
-                RefreshAsk(client_id);break;
+                manager.MessToClient("refresh0:"+temp2,managerOPSelect(client_id));
             }
             case "Zouqi000":{
                 String[] result = temp2.split(",");
@@ -80,6 +78,18 @@ public class GameServer implements ServerNetListener {
             case "HasloseC":{
                 //client_id是发信息的id
                 LoseConnectWait(client_id); break;
+            }
+            case "Result00":{
+                int ssd=Integer.parseInt(temp2);
+                if(players.size()>0) {//如果服务器没初始化就发送命令
+                    setResult(client_id, 2 - ssd);
+                }
+               id0=1000;id1=1000;
+               players.clear();
+               //todo:初始化服务器
+            }
+            case "Huiqi000":{
+                manager.MessToClient("Huiqi000:",managerOPSelect(client_id));
             }
         }
         //清除断连序列
@@ -178,6 +188,14 @@ public class GameServer implements ServerNetListener {
             return -1;
         }
     }
+    public void setRBreycle(){
+        if(players.size()==playMax){
+            for (Integer p : players) {
+                System.out.println("id:"+p+"setRB");
+                RBset(p);
+            }
+        }
+    }
     public GameServer(){
         manager=null;
         RBint=new int[2];
@@ -214,7 +232,6 @@ public class GameServer implements ServerNetListener {
     }
     public void ExtendData(String data) {
     }
-
     public void  RBset(int id){
         for (int i = 0; i < players.size(); i++) {
             if(players.get(i)==id){
@@ -223,5 +240,11 @@ public class GameServer implements ServerNetListener {
             }
         }
     }
+    public void GetResult(int id){//两个客户端都会发送一个结果设置命令,只响应第一个
 
+    }
+    public  void setResult(int id,int res){
+        //System.out.println("takeqi:"+client_id);待删除
+        manager.MessToClient("Result00:"+res,managerOPSelect(id));
+    }
 }

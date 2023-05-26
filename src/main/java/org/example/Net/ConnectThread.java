@@ -53,6 +53,7 @@ public class ConnectThread extends Thread{
                     if ("Idsend00".equals(inputLine.substring(4, 12)))
                     {
                         id=server.set_client_id_cal(Integer.parseInt(inputLine.substring(0,4)));
+                        server.setRBreycle();
                         out.println("Idset000:"+id);
                         if(id==-1){
                             live=false;break;
@@ -61,6 +62,10 @@ public class ConnectThread extends Thread{
                     else {
                         server.getClientMess(inputLine);
                     }
+                if("Result00".equals(inputLine.substring(4, 12))){//收到处理结果指示内部处理
+                    //todo:终结这个连接
+                    break;
+                }
             }
         } catch (IOException e) {
             System.out.println("Error handling client: " + e.getMessage());
